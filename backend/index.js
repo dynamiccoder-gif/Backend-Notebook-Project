@@ -2,10 +2,13 @@ import {connectToMongo} from './db.js'
 import authRoutes from './routes/auth.js';
 import noteRoutes from './routes/note.js';
 
+
 import express from 'express'
 const port=3000;
 
-const app=express()
+
+const app=express();
+
 // Call the function asynchronously
 connectToMongo()
     .then(() => {
