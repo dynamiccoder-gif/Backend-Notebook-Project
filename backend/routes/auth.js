@@ -34,6 +34,36 @@ router.post('/', [
   }
 });
 
+router.post('/login',
+[body('email').isEmail().withMessage('Invalid email format'),body('password').exists()]
+, async (req, res) => {  
+ 
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() }); // Return validation errors
+  }
+
+
+  try {
+    const user = await User.findOne({ email: req.body.email})
+    if(!user){
+      return res.status(401).json({message:'Invalid credentials'})}
+      const passwordMatch = await bcrypt.compare(req.body.password, user.password); // Compare hashed password with plaintext password using bcrypt's compare function
+      if(!passwordMatch){
+        return res.status(401).json({message:'Invalid credentials'})
+      }
+      
+         const token = jwt.sign({userId: user._id }, jwtSecret, { expiresIn: '1h' })
+         res.json(token); // Generate JWT
+      }
+    
+    catch(error)
+    {console.log(error)
+    res.status(500).json({message:'Internal server error'})}
+}
+  
+)
+
 
 export default router;
 
