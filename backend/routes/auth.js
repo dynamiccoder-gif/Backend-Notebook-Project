@@ -4,9 +4,19 @@ import bodyParser from 'body-parser';
 import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
+import fetchuser from '../middlewares/fetchuser.js'
+import  dotenv  from "dotenv";
+
+dotenv.config(
+    {
+        path:'.env'
+    }
+)
+
 const router = express.Router();
 router.use(bodyParser.json());
-const jwtSecret = 'your_strong_secret_key'; 
+const jwtSecret = process.env.jwtSecret; 
+
 
 router.post('/', [
   body('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters long'),
@@ -63,6 +73,18 @@ router.post('/login',
 }
   
 )
+ router.post('/getuser',fetchuser, async (req, res)=>{
+  try {
+    const userId=req.user.userId;
+  const user  = await User.findById(userId).select("-password")
+  res.json(user);
+    
+  } catch (error) {{
+      console.log(error)
+    res.status(500).json({message:'Internal server error'})}
+}
+  }
+  )
 
 
 export default router;
